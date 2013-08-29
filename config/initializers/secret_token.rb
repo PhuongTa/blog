@@ -4,4 +4,19 @@
 # If you change this key, all old signed cookies will become invalid!
 # Make sure the secret is at least 30 characters and all random,
 # no regular words or you'll be exposed to dictionary attacks.
-Blog::Application.config.secret_token = 'e61f03b060109c334f4e2ca96eeeb1735674e9a2576322f91ae4bba63513ef7ab323df285701d33fea2679d6e9462ab50bd3f3b5089f98f31c4a91d101de3275'
+require 'securerandom'
+
+def secure_token
+  token_file = Rails.root.join('.secret')
+  if File.exist?(token_file)
+    # Use the existing token.
+    File.read(token_file).chomp
+  else
+    # Generate a new token and store it in token_file.
+    token = SecureRandom.hex(64)
+    File.write(token_file, token)
+    token
+  end
+end
+
+Blog::Application.config.secret_token = secure_token
